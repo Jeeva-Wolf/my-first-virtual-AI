@@ -6,28 +6,36 @@ import random
 import os
 import subprocess 
 import time
-# Initialize the text-to-speech engine
-engine = pyttsx3.init()
-# Function to make the engine speak
+
 def speak(text):
+    engine = pyttsx3.init()
+    engine.setProperty("rate",170)
     engine.say(text)
     engine.runAndWait()
-    
-# Function to recognize speech input
+    engine.stop()
+
+
+# Speech recognition
 def recognize_speech():
-    recognizer = sr.Recognizer()
+    r = sr.Recognizer()
+
     with sr.Microphone() as source:
-        print("Listening for your word...")
-        audio = recognizer.listen(source)
+        print("Listening...")
+        r.adjust_for_ambient_noise(source, duration=1)
+
         try:
-            response = recognizer.recognize_google(audio)
-            return response.lower()
-        except sr.UnknownValueError:
-            print("Sorry, I didn't understand.")
-            return None
-        except sr.RequestError:
-            speak("Sorry, the speech service is down. Please try again.")
-            return None
+            audio = r.listen(source, timeout=10, phrase_time_limit=7)
+            command = r.recognize_google(audio, language="en-IN")
+            print("You said:", command)
+            return command.lower()
+
+        except sr.WaitTimeoutError:
+            return ""
+
+        except Exception as e:
+            print("Error:", e)
+            return ""
+        
 
 def ask_quiz():
     while True:
@@ -38,7 +46,7 @@ def ask_quiz():
         speak(" Chennai")
         print('a.Chennai')
         speak(" Delhi")
-        print('b.Delhi')
+        print('b.Dehli')
         speak(" Mumbai")
         print('c.Mumbai')
         answer1 = recognize_speech()
@@ -49,16 +57,16 @@ def ask_quiz():
             speak("Incorrect! The capital of India is Delhi.")
 
         # Question 2
-        speak("")
+        speak("Question 2. What is the full form of CD?")
         speak(" Control Data")
         print('a.Control Data')
         speak(" Control Disk")
         print('b.Control Disk')
-        speak("Compact Disk")
+        speak(" Compact Disk")
         print('c.Compact Disk')
         answer2 = recognize_speech()
 
-        if 'Compact Disk' in answer2:
+        if 'compact disk' in answer2:
             speak("Correct! The full form of CD is Compact Disk.")
         else:
             speak("Incorrect! The full form of CD is Compact Disk.")
@@ -76,8 +84,7 @@ def ask_quiz():
         if 'jupiter' in answer3:
             speak("Correct! The largest planet is Jupiter!")
         else:
-            speak("Incorrect! The largest planet is Jupiter.")
-        
+            speak("Incorrect! The largest planet is Jupiter.")   
 
         speak("Thank you for participating in the quiz game.")
         repeat()
@@ -124,34 +131,17 @@ def how_am_i():
     speak(random.choice(replies))
  
  
-def tell_joke():
-    # Joke 1
-    speak('10 20 30 40 50. what comes after. 50')
-    joke_1 = recognize_speech()
-    if '60' in joke_1 or 'sixty' in joke_1:
-        speak('correct! your brillitant')
-    else:
-        speak('incorrect! the answer is sixty')
-
-    # Joke 2
-    speak('two friends. going in the bike. one friend said that. iam hungry. and other friend stops the bike. and his hunger got over. how?')
-    joke_2 = recognize_speech()
-    if 'breakfast' in joke_2:
-        speak('correct! your very brillitant ')
-    else:
-        speak('incorrect! beacause he put the break fastly. thats why breakfast!')           
-
-     
+def tell_joke(): 
+    jokes = ['10   20 .  30   40   50.  what comes.  after 50...  any guess....  you think its 60..  your wrong its 51','two friends. going in the bike.  one friend said. iam hungry. the other friend. stop bike fastly. is hunger got over. how. any guesses.. because he put the break fastly. that why breakfast']
+    speak(random.choice(jokes))  
+    
+    
 def where_born(): 
     speak('I was created by a Python code by. jeevaa')
     
 def age():
     speak('No age for me. because iam a machine ')      
          
- # def phone():
-   # speak('tell your phone number please')
-    # import phonenumbers
-    
 
 def how_are_you(): 
     speak('I am fine sir, thank you.')
@@ -171,7 +161,7 @@ def play_random_song():
 
     subprocess.Popen(['start', '', song_path], shell=True)
 
-    time.sleep(53) 
+    time.sleep(40) 
 
     speak("The song has finished playing.")
     repeat()  
@@ -227,24 +217,20 @@ def repeat():
             my_time()     
         elif 'exit' in command or 'bye' in command or 'stop' in command:
             exit_0()  
-        elif 'hello' in command:
+        elif 'hello' in command or 'hi' in command:
             speak('hello. whatsapp. nice to meet you')   
         elif 'song' in command:
             play_random_song()         
         else:
-            speak("Sorry, I didn't catch that. Please say it again. ")
+            speak("Sorry, I didn't catch that. Please say it slowly. ")
 
        
 def main():
-    WAKE_WORD = "jarvis" 
-    while True:
-        command = recognize_speech()
 
-        if command and WAKE_WORD in command:
-            speak("Hello! I am your voice assistant! say wikipedia to search a word. or you also ask me gendral question. or i can also play a song.")
-            break
-        else:
-            print("Waiting for the wake-up word...")
+    speak("Hello! I am your voice assistant!")
+    speak("What can I do for you today?")
+
+    speak("You can say 'Wikipedia'.  to search a word, or ask me gendral questions, or we can play a quiz game. or, i can also play a song.")
 
     while True:  
         command = recognize_speech()
@@ -281,10 +267,11 @@ def main():
             my_time()     
         elif 'exit' in command or 'bye' in command or 'stop' in command:
             exit_0()  
-        elif 'hello' in command:
+        elif 'hello' in command or 'hi' in command:
             speak('hello. whatsapp. nice to meet you')   
         elif 'song' in command:
             play_random_song()         
         else:
-            speak("Sorry, I didn't catch that. Please say correctly or repeat it.")
+            speak("Sorry, I didn't catch that. Please say correctly. or repeat it ")
+
 obj=main()
